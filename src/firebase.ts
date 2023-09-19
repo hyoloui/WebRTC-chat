@@ -7,7 +7,7 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  apiKey: "AIzaSyClUPvZoQJ5G_9kSzYXHgc7YBGw12oMisc",
   authDomain: "nextjs-chat-aee05.firebaseapp.com",
   projectId: "nextjs-chat-aee05",
   storageBucket: "nextjs-chat-aee05.appspot.com",
