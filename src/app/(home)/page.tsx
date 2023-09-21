@@ -1,7 +1,9 @@
 "use client";
 
-import { auth } from "@/firebase";
+import { auth, db } from "@/firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
+import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import { CgSpinner } from "react-icons/cg";
@@ -11,6 +13,22 @@ import Login from "@/components/Login";
 
 export default function Home() {
   const [user, loading] = useAuthState(auth);
+
+  useEffect(() => {
+    // 유저가 로그인하면 유저 정보를 데이터베이스에 저장
+    if (user) {
+      setDoc(
+        doc(db, "users", user.uid),
+        {
+          email: user.email,
+          lastActive: serverTimestamp(),
+          photoURL: user.photoURL,
+          displayName: user.displayName,
+        },
+        { merge: true }
+      );
+    }
+  });
 
   if (loading) {
     return (
