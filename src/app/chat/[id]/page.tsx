@@ -2,26 +2,30 @@
 
 import { auth, db } from "@/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-
-import { useParams } from "next/navigation";
-
-import BottomBar from "@/components/BottomBar";
-import SideBar from "@/components/SideBar";
-
-import type { User } from "firebase/auth";
 import { collection, doc, orderBy, query } from "firebase/firestore";
 import {
   useCollectionData,
-  useDocument,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
+
+import { useParams } from "next/navigation";
+
+import SideBar from "@/components/SideBar";
+import TopBar from "@/components/TopBar";
+import BottomBar from "@/components/BottomBar";
+import MessageBubble from "@/components/MessageBubble";
+
 import { CgSpinner } from "react-icons/cg";
 import { IoChatbubbleOutline } from "react-icons/io5";
-import TopBar from "@/components/TopBar";
+
+import type { User } from "firebase/auth";
+import type { IMessage } from "@/types";
+import { useEffect, useRef } from "react";
 
 const ChatPage = () => {
   const { id } = useParams();
   const [user] = useAuthState(auth);
+  const ref = useRef<null | HTMLDivElement>(null);
 
   const q = query(
     collection(db, "chats", id as string, "messages"),
@@ -35,6 +39,11 @@ const ChatPage = () => {
     return users?.filter((user) => user.email !== currentUser?.email)[0];
   };
 
+  useEffect(() => {
+    // Scroll to bottom
+    ref.current?.scrollIntoView();
+  }, [messages]);
+
   return (
     <main className="grid w-full grid-cols-8">
       <div className="col-span-2">
@@ -47,9 +56,8 @@ const ChatPage = () => {
           <TopBar user={getOtherUser(chat.usersData, user as User)} />
         )}
 
-        <div className="flex w-full h-full px-6 pt-4 mb-2 overflow-y-scroll no-scrollbar">
+        <div className="flex w-full h-full px-6 pt-4 mb-2 max-h-[calc(100vh_-_70px_-_74px_-_10px)] overflow-y-scroll no-scrollbar">
           <div className="flex flex-col w-full">
-            {/* Message */}
             {loading && (
               <div className="flex flex-col w-full h-full">
                 <CgSpinner className="w-full h-12 text-gray-400 animate-spin" />
@@ -63,6 +71,17 @@ const ChatPage = () => {
                 </p>
               </div>
             )}
+
+            {/* Message */}
+            {messages?.map((message, index) => (
+              <MessageBubble
+                key={index}
+                user={user as User}
+                message={message as IMessage}
+              />
+            ))}
+
+            <div ref={ref}></div>
           </div>
         </div>
 
