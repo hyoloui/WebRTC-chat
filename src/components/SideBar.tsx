@@ -57,7 +57,7 @@ const SideBar = () => {
           로그아웃
         </button>
       </div>
-      <div>
+      <div className="w-full">
         {filteredUsers?.map((receiver) => (
           <UserListItem
             key={receiver.id}
