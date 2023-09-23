@@ -5,17 +5,15 @@ import { type DocumentData, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { CgSpinner } from "react-icons/cg";
 
 import UserListItem from "./UserListItem";
 import type { IChat } from "@/types";
 
-interface ISideBarProps {
-  selectedChatId?: string;
-}
-const SideBar = ({ selectedChatId }: ISideBarProps) => {
+const SideBar = () => {
   const router = useRouter();
+  const { id } = useParams();
 
   const [user] = useAuthState(auth);
   const [snapshotUser] = useCollection(collection(db, "users"));
@@ -66,7 +64,7 @@ const SideBar = ({ selectedChatId }: ISideBarProps) => {
             sender={user}
             receiver={receiver}
             chats={chats as IChat[]}
-            selectedChatId={selectedChatId}
+            selectedChatId={typeof id === "string" ? id : undefined}
           />
         ))}
       </div>

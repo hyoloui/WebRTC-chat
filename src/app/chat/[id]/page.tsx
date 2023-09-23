@@ -1,14 +1,12 @@
+"use client";
+
 import SideBar from "@/components/SideBar";
-import { useParams } from "next/navigation";
 
 const ChatPage = () => {
-  const { id } = useParams();
-  const selectedChatId = typeof id === "string" ? id : undefined;
-
   return (
     <main className="grid w-full grid-cols-8">
       <div className="col-span-2">
-        <SideBar selectedChatId={selectedChatId} />
+        <SideBar />
       </div>
 
       <div className="col-span-6 flex justify-center h-screen">
