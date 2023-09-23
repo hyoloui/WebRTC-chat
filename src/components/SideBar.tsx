@@ -1,7 +1,7 @@
 "use client";
 
 import { auth, db } from "@/firebase";
-import { collection } from "firebase/firestore";
+import { type DocumentData, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 
@@ -9,31 +9,44 @@ import { useRouter } from "next/navigation";
 import { CgSpinner } from "react-icons/cg";
 
 import UserListItem from "./UserListItem";
+import type { IChat } from "@/types";
 
-const SideBar = () => {
+interface ISideBarProps {
+  selectedChatId?: string;
+}
+const SideBar = ({ selectedChatId }: ISideBarProps) => {
   const router = useRouter();
 
   const [user] = useAuthState(auth);
   const [snapshotUser] = useCollection(collection(db, "users"));
 
-  const users = snapshotUser?.docs.map((doc) => ({
+  const users = snapshotUser?.docs.map((doc: DocumentData) => ({
     id: doc.id,
     ...doc.data(),
   }));
 
   const filteredUsers = users?.filter(
-    (singleUser) => singleUser.id !== auth.currentUser?.uid
+    (singleUser) => singleUser.email !== user?.email
   );
+
+  const [snapshotChat] = useCollection(collection(db, "chats"));
+  const chats = snapshotChat?.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 
   const logout = () => {
     auth.signOut();
     router.push("/");
   };
 
-  if (!user)
-    <div className="flex justify-center mt-10">
-      <CgSpinner className="animate-spin w-10 h-10" />
-    </div>;
+  if (!user) {
+    return (
+      <div className="flex justify-center mt-10">
+        <CgSpinner className="animate-spin w-10 h-10" />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-start w-full h-screen border-l border-r border-gray-200">
       <div className="flex items-center justify-between w-full p-4 text-xl font-bold border-b border-gray-200 h-[4.375rem]">
@@ -47,7 +60,15 @@ const SideBar = () => {
         </button>
       </div>
       <div>
-        <UserListItem />
+        {filteredUsers?.map((receiver) => (
+          <UserListItem
+            key={receiver.id}
+            sender={user}
+            receiver={receiver}
+            chats={chats as IChat[]}
+            selectedChatId={selectedChatId}
+          />
+        ))}
       </div>
     </div>
   );
