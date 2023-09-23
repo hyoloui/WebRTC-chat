@@ -10,9 +10,14 @@ import SideBar from "@/components/SideBar";
 
 import type { User } from "firebase/auth";
 import { collection, doc, orderBy, query } from "firebase/firestore";
-import { useCollectionData, useDocument } from "react-firebase-hooks/firestore";
+import {
+  useCollectionData,
+  useDocument,
+  useDocumentData,
+} from "react-firebase-hooks/firestore";
 import { CgSpinner } from "react-icons/cg";
 import { IoChatbubbleOutline } from "react-icons/io5";
+import TopBar from "@/components/TopBar";
 
 const ChatPage = () => {
   const { id } = useParams();
@@ -24,7 +29,11 @@ const ChatPage = () => {
   );
 
   const [messages, loading] = useCollectionData(q);
-  const [chat] = useDocument(doc(db, "chats", id as string));
+  const [chat] = useDocumentData(doc(db, "chats", id as string));
+
+  const getOtherUser = (users: User[], currentUser: User) => {
+    return users?.filter((user) => user.email !== currentUser?.email)[0];
+  };
 
   return (
     <main className="grid w-full grid-cols-8">
@@ -34,7 +43,10 @@ const ChatPage = () => {
 
       <div className="flex flex-col w-full col-span-6">
         {/* Top bar */}
-        Top bar
+        {user && chat && (
+          <TopBar user={getOtherUser(chat.usersData, user as User)} />
+        )}
+
         <div className="flex w-full h-full px-6 pt-4 mb-2 overflow-y-scroll no-scrollbar">
           <div className="flex flex-col w-full">
             {/* Message */}
@@ -53,6 +65,7 @@ const ChatPage = () => {
             )}
           </div>
         </div>
+
         {/* Bottom bar */}
         <BottomBar user={user as User} chatId={id as string} />
       </div>
