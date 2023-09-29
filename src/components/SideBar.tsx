@@ -8,7 +8,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { CgSpinner } from "react-icons/cg";
 
-import UserListItem from "./UserListItem";
+import UserListItem from "@/components/UserListItem";
 import type { IChat } from "@/types";
 
 const SideBar = () => {
